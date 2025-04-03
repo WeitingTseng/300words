@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小學基礎單字300：辨識</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body{width: 100vw;height: 100vh;background-image: linear-gradient(to top, #a8edea 0%, #fed6e3 100%);  font-family: "Noto Sans TC", sans-serif;}
+        #main{position: relative;width: 80vw;max-width: 500px;height: 80vw;max-height: 500px;background:#fafafa;border-radius: 30px;filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.1));margin: 30px auto 10px;display: flex;justify-content:center;align-items:center;}
+        #main p#en{font-size: 60px;font-weight: 900;text-align: center;padding: 0 40px;}
+        #main input#ch{font-size: 30px;font-weight: 900;text-align: center;border: 0;outline: none;display: inline-block;}
+        #main input::-webkit-input-placeholder{color: rgba(0,0,0,0.3);}
+        #en{margin-top: -15px;}
+        #ch{position: absolute;bottom: 30px;padding: 5px 15px;background: #fff;border-radius: 30px;width: 150px; }
+        #count{display: flex;justify-content:center;align-items:center;}
+        #correct,#wrong{width: 45vw;max-width: 160px;height: 50px;border-radius: 30px;text-align: center;padding: 5px 20px;margin: 15px 10px;color: #fff;font-size: 30px;font-weight: 700;}
+        #correct{background: #49D47E;}
+        #wrong{background: #D4494B;}
+    </style>
+
+</head>
+<body>
+    <div id="main">
+        <p id="en"></p>
+            <input type="text" id="ch" oninput="adjustWidth()" placeholder="輸入中文">
+    </div>
+    <div id="count">
+        <div id="correct">0</div>
+        <div id="wrong">0</div>
+    </div>
+    <script>
+   document.addEventListener("DOMContentLoaded", () => {
+    const enElement = document.getElementById("en");
+    const chInput = document.getElementById("ch");
+    const correctElement = document.getElementById("correct");
+    const wrongElement = document.getElementById("wrong");
+    const mainElement = document.getElementById("main");
+
+    // 單字對應表（允許多個中文答案，用「；」分隔）
+    let words = [
+    { en: "afternoon", ch: "下午" },
+    { en: "evening", ch: "傍晚" },
+    { en: "fine", ch: "美好的；沒關係" },
+    { en: "good", ch: "好的" },
+    { en: "goodbye", ch: "再見" },
+    { en: "hello", ch: "哈囉；嗨" },
+    { en: "morning", ch: "早上" },
+    { en: "night", ch: "晚上" },
+    { en: "thank", ch: "謝謝" },
+    { en: "book", ch: "書" },
+    { en: "bookbag", ch: "書包" },
+    { en: "chair", ch: "椅子" },
+    { en: "computer", ch: "電腦" },
+    { en: "desk", ch: "書桌" },
+    { en: "eraser", ch: "橡皮擦" },
+    { en: "marker", ch: "麥克筆" },
+    { en: "notebook", ch: "筆記本" },
+    { en: "pen", ch: "原子筆" },
+    { en: "pencil", ch: "鉛筆" },
+    { en: "pencilbox", ch: "鉛筆盒" },
+    { en: "ruler", ch: "尺" },
+    { en: "father", ch: "父親；爸爸" },
+    { en: "mother", ch: "母親；媽媽" },
+    { en: "dad", ch: "爸爸；爸" },
+    { en: "mom", ch: "媽媽；媽" },
+    { en: "grandfather", ch: "祖父；外公；阿公；爺爺" },
+    { en: "grandmother", ch: "祖母；外婆；阿嬤；奶奶" },
+    { en: "grandma", ch: "祖母；外婆；阿嬤；奶奶" },
+    { en: "grandpa", ch: "祖父；外公；阿公；爺爺" },
+    { en: "brother", ch: "兄；弟；哥哥；弟弟；兄弟" },
+    { en: "sister", ch: "姐；妹；姊姊；妹妹；姊妹" },
+    { en: "girl", ch: "女孩" },
+    { en: "boy", ch: "男孩" },
+    { en: "student", ch: "學生" },
+    { en: "classmate", ch: "同學" },
+    { en: "friend", ch: "朋友" },
+    { en: "Mr", ch: ",先生" },
+    { en: "arm", ch: "手臂" },
+    { en: "ear", ch: "耳朵" },
+    { en: "eye", ch: "眼睛" },
+    { en: "feet", ch: "雙腳" },
+    { en: "foot", ch: "腳" },
+    { en: "hair", ch: "頭髮" },
+    { en: "hand", ch: "手" },
+    { en: "head", ch: "頭" },
+    { en: "leg", ch: "腿" },
+    { en: "mouth", ch: "嘴" },
+    { en: "nose", ch: "鼻" },
+    { en: "apple", ch: "蘋果" },
+    { en: "banana", ch: "香蕉" },
+    { en: "bread", ch: "麵包" },
+    { en: "cake", ch: "蛋糕" },
+    { en: "egg", ch: "蛋" },
+    { en: "hamburger", ch: "漢堡" },
+    { en: "hotdog", ch: "熱狗" },
+    { en: "icecream", ch: "冰淇淋" },
+    { en: "juice", ch: "果汁" },
+    { en: "milk", ch: "牛奶" },
+    { en: "pizza", ch: "披薩" },
+    { en: "sandwich", ch: "三明治" },
+    { en: "soup", ch: "湯" },
+    { en: "tea", ch: "茶" },
+    { en: "water", ch: "水" },
+    { en: "breakfast", ch: "早餐" },
+    { en: "dinner", ch: "晚餐" },
+    { en: "lunch", ch: "午餐" },
+    { en: "animal", ch: "動物" },
+    { en: "bear", ch: "熊" },
+    { en: "bird", ch: "鳥" },
+    { en: "cat", ch: "貓" },
+    { en: "chicken", ch: "雞" },
+    { en: "dog", ch: "狗" },
+    { en: "elephant", ch: "象" },
+    { en: "fish", ch: "魚" },
+    { en: "lion", ch: "獅子" },
+    { en: "monkey", ch: "猴子" },
+    { en: "pig", ch: "豬" },
+    { en: "rabbit", ch: "兔" },
+    { en: "snake", ch: "蛇" },
+    { en: "tiger", ch: "老虎" },
+    { en: "zoo", ch: "動物園" },
+    { en: "one", ch: "一" },
+    { en: "two", ch: "二" },
+    { en: "three", ch: "三" },
+    { en: "four", ch: "四" },
+    { en: "five", ch: "五" },
+    { en: "six", ch: "六" },
+    { en: "seven", ch: "七" },
+    { en: "eight", ch: "八" },
+    { en: "nine", ch: "九" },
+    { en: "ten", ch: "十" },
+    { en: "eleven", ch: "十一" },
+    { en: "twelve", ch: "十二" },
+    { en: "zero", ch: "零" },
+    { en: "bathroom", ch: "浴室" },
+    { en: "bedroom", ch: "臥房" },
+    { en: "bookstore", ch: "書店" },
+    { en: "classroom", ch: "教室" },
+    { en: "home", ch: "家" },
+    { en: "kitchen", ch: "廚房" },
+    { en: "library", ch: "圖書館" },
+    { en: "livingroom", ch: "客廳" },
+    { en: "park", ch: "公園" },
+    { en: "school", ch: "學校" },
+    { en: "store", ch: "商店" },
+    { en: "supermarket", ch: "超級市場" },
+    { en: "black", ch: "黑色的；黑色" },
+    { en: "blue", ch: "藍色的；藍色" },
+    { en: "brown", ch: "棕色的；棕色；咖啡色" },
+    { en: "color", ch: "顏色；色彩" },
+    { en: "green", ch: "綠色的；綠色" },
+    { en: "orange", ch: "橘色的；橘色" },
+    { en: "pink", ch: "粉紅色的；粉紅；粉紅色" },
+    { en: "purple", ch: "紫色的；紫色" },
+    { en: "red", ch: "紅色的；紅色" },
+    { en: "white", ch: "白色的；白色" },
+    { en: "yellow", ch: "黃色的；黃色" },
+    { en: "dress", ch: "洋裝；裙子" },
+    { en: "hat", ch: "帽子" },
+    { en: "jacket", ch: "夾克；外套" },
+    { en: "shirt", ch: "襯衫" },
+    { en: "shoes", ch: "鞋子" },
+    { en: "shorts", ch: "短褲" },
+    { en: "skirt", ch: "裙子" },
+    { en: "T-shirt", ch: "運動杉" },
+    { en: "bad", ch: "不好的；壞的" },
+    { en: "beautiful", ch: "美麗的；漂亮的" },
+    { en: "big", ch: "大的" },
+    { en: "clean", ch: "乾淨的" },
+    { en: "cloudy", ch: "多雲的" },
+    { en: "cold", ch: "冷的" },
+    { en: "cool", ch: "涼爽的" },
+    { en: "cute", ch: "可愛的" },
+    { en: "fat", ch: "胖的" },
+    { en: "handsome", ch: "英俊的" },
+    { en: "hot", ch: "熱的" },
+    { en: "long", ch: "長的" },
+    { en: "new", ch: "新的" },
+    { en: "nice", ch: "不錯的" },
+    { en: "old", ch: "舊的；老的" },
+    { en: "rainy", ch: "下雨的" },
+    { en: "short", ch: "短的" },
+    { en: "small", ch: "小的" },
+    { en: "smart", ch: "聰明的" },
+    { en: "sunny", ch: "晴朗的" },
+    { en: "tall", ch: "高的" },
+    { en: "thin", ch: "瘦的" },
+    { en: "warm", ch: "溫暖的" },
+    { en: "windy", ch: "有風的" },
+    { en: "am", ch: "是" },
+    { en: "are", ch: "是" },
+    { en: "close", ch: "關" },
+    { en: "come", ch: "來" },
+    { en: "cook", ch: "煮" },
+    { en: "cut", ch: "切" },
+    { en: "dance", ch: "跳舞" },
+    { en: "draw", ch: "畫" },
+    { en: "drink", ch: "喝" },
+    { en: "eat", ch: "吃" },
+    { en: "fly", ch: "飛" },
+    { en: "getup", ch: "起床" },
+    { en: "go", ch: "去" },
+    { en: "has", ch: "有" },
+    { en: "have", ch: "有" },
+    { en: "help", ch: "幫忙" },
+    { en: "is", ch: "是" },
+    { en: "like", ch: "喜歡" },
+    { en: "listen", ch: "聽" },
+    { en: "look", ch: "看" },
+    { en: "meet", ch: "遇見" },
+    { en: "open", ch: "開" },
+    { en: "play", ch: "玩" },
+    { en: "read", ch: "閱讀" },
+    { en: "run", ch: "跑" },
+    { en: "see", ch: "看到" },
+    { en: "sing", ch: "唱" },
+    { en: "sleep", ch: "睡" },
+    { en: "study", ch: "研讀；讀；讀書；學習" },
+    { en: "swim", ch: "游泳" },
+    { en: "take", ch: "拿；搭" },
+    { en: "talk", ch: "說" },
+    { en: "walk", ch: "走" },
+    { en: "want", ch: "想要" },
+    { en: "wash", ch: "洗" },
+    { en: "watch", ch: "看" },
+    { en: "write", ch: "寫" },
+    { en: "bike", ch: "腳踏車" },
+    { en: "bus", ch: "公車" },
+    { en: "car", ch: "汽車" },
+    { en: "taxi", ch: "計程車" },
+    { en: "train", ch: "火車" },
+    { en: "he", ch: "他" },
+    { en: "her", ch: "她的" },
+    { en: "his", ch: "他的" },
+    { en: "I", ch: "我" },
+    { en: "it", ch: "它" },
+    { en: "me", ch: "我" },
+    { en: "my", ch: "我的" },
+    { en: "she", ch: "她" },
+    { en: "they", ch: "他們" },
+    { en: "we", ch: "我們" },
+    { en: "you", ch: "你；你們" },
+    { en: "your", ch: "你的；你們的" },
+    { en: "how", ch: "如何" },
+    { en: "what", ch: "什麼" },
+    { en: "when", ch: "何時" },
+    { en: "where", ch: "哪裡" },
+    { en: "who", ch: "誰" },
+    { en: "art", ch: "美術" },
+    { en: "Chinese", ch: "中文" },
+    { en: "English", ch: "英文" },
+    { en: "math", ch: "數學" },
+    { en: "P", ch: "E.,體育" },
+    { en: "baseball", ch: "棒球" },
+    { en: "basketball", ch: "籃球" },
+    { en: "dodgeball", ch: "躲避球" },
+    { en: "doctor", ch: "醫生" },
+    { en: "teacher", ch: "老師" },
+    { en: "fall", ch: "秋天" },
+    { en: "spring", ch: "春天" },
+    { en: "summer", ch: "夏天" },
+    { en: "winter", ch: "冬天" },
+    { en: "January", ch: "一月" },
+    { en: "February", ch: "二月" },
+    { en: "March", ch: "三月" },
+    { en: "April", ch: "四月" },
+    { en: "May", ch: "五月" },
+    { en: "June", ch: "六月" },
+    { en: "July", ch: "七月" },
+    { en: "August", ch: "八月" },
+    { en: "September", ch: "九月" },
+    { en: "October", ch: "十月" },
+    { en: "November", ch: "十一月" },
+    { en: "December", ch: "十二月" },
+    { en: "Monday", ch: "星期一；週一" },
+    { en: "Tuesday", ch: "星期二；週二" },
+    { en: "Wednesday", ch: "星期三；週三" },
+    { en: "Thursday", ch: "星期四；週四" },
+    { en: "Friday", ch: "星期五；週五" },
+    { en: "Saturday", ch: "星期六；週六" },
+    { en: "Sunday", ch: "星期天；週日" },
+    { en: "at", ch: "在…；在" },
+    { en: "by", ch: "在旁；出自於" },
+    { en: "in", ch: "在…之內；裡面" },
+    { en: "on", ch: "在…之上；上面" },
+    { en: "out", ch: "向外；外面" },
+    { en: "outside", ch: "外面" },
+    { en: "under", ch: "下面" },
+    { en: "angry", ch: "生氣的" },
+    { en: "happy", ch: "高興的；開心的" },
+    { en: "hungry", ch: "餓的" },
+    { en: "sad", ch: "悲傷的；難過的" },
+    { en: "sick", ch: "生病的" },
+    { en: "sorry", ch: "抱歉的" },
+    { en: "thirsty", ch: "渴的" },
+    { en: "tired", ch: "累的" },
+    { en: "a", ch: "一個" },
+    { en: "an", ch: "一個" },
+    { en: "and", ch: "和" },
+    { en: "bag", ch: "袋子" },
+    { en: "ball", ch: "球" },
+    { en: "bed", ch: "床" },
+    { en: "birthday", ch: "生日" },
+    { en: "box", ch: "盒子" },
+    { en: "can", ch: "罐頭" },
+    { en: "CD", ch: "光碟" },
+    { en: "comicbook", ch: "漫畫書" },
+    { en: "day", ch: "日；天" },
+    { en: "do", ch: "做" },
+    { en: "does", ch: "做" },
+    { en: "dollar", ch: "元" },
+    { en: "door", ch: "門" },
+    { en: "flower", ch: "花" },
+    { en: "great", ch: "棒的" },
+    { en: "here", ch: "這裡" },
+    { en: "key", ch: "鑰匙" },
+    { en: "kite", ch: "風箏" },
+    { en: "may", ch: "可以" },
+    { en: "name", ch: "名字" },
+    { en: "no", ch: "不" },
+    { en: "not", ch: "不" },
+    { en: "ok", ch: "好" },
+    { en: "some", ch: "一些" },
+    { en: "table", ch: "桌子" },
+    { en: "telephone", ch: "電話" },
+    { en: "that", ch: "那個" },
+    { en: "the", ch: "這；那" },
+    { en: "there", ch: "那裡" },
+    { en: "these", ch: "這些" },
+    { en: "this", ch: "這個" },
+    { en: "those", ch: "那些" },
+    { en: "today", ch: "今天" },
+    { en: "too", ch: "也；太" },
+    { en: "toy", ch: "玩具" },
+    { en: "tree", ch: "樹" },
+    { en: "TV", ch: "電視" },
+    { en: "very", ch: "非常" },
+    { en: "weather", ch: "天氣" },
+    { en: "window", ch: "窗戶" },
+    { en: "yes", ch: "是" }
+    ];
+
+    let currentWord = {}; // 當前顯示的單字
+    let correctCount = 0; // 正確累計次數
+    let wrongCount = 0;   // 錯誤累計次數
+    let wrongWords = [];  // 記錄答錯的單字
+
+    // 更新計數顯示
+    function updateCount() {
+        correctElement.textContent = correctCount;
+        wrongElement.textContent = wrongCount;
+    }
+
+    // 取得隨機單字
+    function getRandomWord() {
+        if (words.length === 0) {
+            // 單字全部測驗完，顯示錯誤單字
+            enElement.style.fontSize = "50px";
+            enElement.style.color = "#666666";
+            enElement.textContent = "重新整理頁面就能再挑戰一次囉！";
+            chInput.style.display = "none"; // 隱藏輸入框
+            mainElement.style.background = "#fafafa"; // 恢復白色背景
+            if (wrongWords.length > 0) {
+                alert("你還需要多練習的單字:\n" + wrongWords.map(w => `${w.en} = ${w.ch}`).join("\n"));
+            } else {
+                alert("很棒唷！你已經掌握了小學生300個基礎單字!");
+            }
+            return;
+        }
+
+        mainElement.style.background = "#fff"; // 恢復白色背景
+        const randomIndex = Math.floor(Math.random() * words.length);
+        currentWord = words.splice(randomIndex, 1)[0]; // 取出單字並從陣列中移除
+        enElement.textContent = currentWord.en;
+        chInput.value = ""; // 清空輸入框
+    }
+
+    // 監聽 Enter 鍵輸入
+    chInput.addEventListener("keyup", (event) => {
+        if (event.key === "Enter") {
+            const userInput = chInput.value.trim();
+
+            // 取得正確的所有中文翻譯（用「；」拆分）
+            const correctAnswers = currentWord.ch.split("；").map(ans => ans.trim());
+
+            // 判斷輸入是否符合其中一個正確答案
+            if (correctAnswers.includes(userInput)) {
+                correctCount++;
+                mainElement.style.background = "#49D47E"; // 綠色 (答對)
+            } else {
+                wrongCount++;
+                mainElement.style.background = "#D4494B"; // 紅色 (答錯)
+                wrongWords.push(currentWord); // 記錄錯誤的單字
+                enElement.textContent = `${currentWord.en} (${currentWord.ch})`;// #en 顯示正確的中文答案
+            }
+
+            // 更新計數
+            updateCount();
+
+            // 1 秒後顯示下一個單字並恢復背景
+            setTimeout(getRandomWord, 1000);
+        }
+    });
+
+    // 初始化計數與第一個單字
+    updateCount();
+    getRandomWord();
+});
+    </script>
+</body>
+</html>
