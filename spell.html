@@ -355,6 +355,7 @@
     let correctCount = 0; // 正確累計次數
     let wrongCount = 0;   // 錯誤累計次數
     let wrongWords = [];  // 記錄答錯的單字
+    let isProcessing = false; //避免重複點擊
 
     // 更新計數顯示
     function updateCount() {
@@ -383,6 +384,7 @@
         const randomIndex = Math.floor(Math.random() * words.length);
         currentWord = words.splice(randomIndex, 1)[0]; // 取出單字並從陣列中移除
         chElement.textContent = currentWord.ch;
+        isProcessing = false; // 解除鎖定
         enInput.value = ""; // 清空輸入框
     }
 
@@ -390,10 +392,12 @@
     enInput.addEventListener("keyup", (event) => {
         if (event.key === "Enter") {
             const userInput = enInput.value.trim().toLowerCase();
-            
+            if (isProcessing) return; // 避免連續提交
+            isProcessing = true;
             // 如果輸入是空值，則顯示提示並停止執行
             if (userInput === "") {
                 alert("我沒有看到你的答案，請輸入單字唷！");
+                isProcessing = false;
                 return;
             }
 
