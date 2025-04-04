@@ -355,6 +355,7 @@
     let correctCount = 0; // 正確累計次數
     let wrongCount = 0;   // 錯誤累計次數
     let wrongWords = [];  // 記錄答錯的單字
+    let isProcessing = false; // 避免重複點擊
 
     // 更新計數顯示
     function updateCount() {
@@ -383,20 +384,25 @@
         const randomIndex = Math.floor(Math.random() * words.length);
         currentWord = words.splice(randomIndex, 1)[0]; // 取出單字並從陣列中移除
         enElement.textContent = currentWord.en;
+        isProcessing = false; // 解除鎖定
         chInput.value = ""; // 清空輸入框
+        chInput.disabled = false; // 重新啟用輸入
     }
 
     // 監聽 Enter 鍵輸入
     chInput.addEventListener("keyup", (event) => {
         if (event.key === "Enter") {
             const userInput = chInput.value.trim();
-
+            if (chInput.disabled) return;// 如果輸入框被鎖定，則不執行
+            if (isProcessing) return; // 避免連續提交
+            isProcessing = true;
             // 如果輸入是空值，則顯示提示並停止執行
             if (userInput === "") {
                 alert("我沒有看到你的答案，請輸入中文翻譯唷！");
+                isProcessing = false;
                 return;
             }
-
+            chInput.disabled = true; // 鎖定輸入
             // 取得正確的所有中文翻譯（用「；」拆分）
             const correctAnswers = currentWord.ch.split("；").map(ans => ans.trim());
 
