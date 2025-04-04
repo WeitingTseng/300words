@@ -360,6 +360,7 @@
     let wrongCount = 0;   // 錯誤累計次數
     let wrongWords = [];  // 記錄答錯的單字
     let voicesLoaded = false; // 檢查語音是否已加載
+    let isProcessing = false; //避免重複點擊
 
      // 監聽語音加載
      speechSynthesis.onvoiceschanged = () => {
@@ -401,6 +402,7 @@
             }
 
         enElement.textContent = currentWord.en;
+        isProcessing = false; // 解除鎖定
         chInput.value = ""; // 清空輸入框
         speakCurrentWord(); // 自動播放語音
     }
@@ -409,10 +411,12 @@
     chInput.addEventListener("keyup", (event) => {
         if (event.key === "Enter") {
             const userInput = chInput.value.trim();
-
+            if (isProcessing) return; // 避免連續提交
+            isProcessing = true;
             // 如果輸入是空值，則顯示提示並停止執行
             if (userInput === "") {
                 alert("我沒有看到你的答案，請輸入中文翻譯唷！");
+                isProcessing = false;
                 return;
             }
 
