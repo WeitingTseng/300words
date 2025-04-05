@@ -417,10 +417,19 @@
         // 建立已完成清單 UI
         function renderDone() {
             elDone.innerHTML = "";
-            doneList.forEach(item => {
+            doneList.forEach((item, index) => {
                 const doneBtn = document.createElement("span");
                 doneBtn.textContent = item.en;
                 doneBtn.style.margin = "10px";
+                doneBtn.style.cursor = "pointer";
+                doneBtn.style.borderBottom = "1px solid #20E2D7"; // 提示可以點擊
+                doneBtn.title = "點擊移回練習區";
+                doneBtn.onclick = () => {
+                    practiseList.push(item);
+                    doneList.splice(index, 1);
+                    renderPractise();
+                    renderDone();
+                };
                 elDone.appendChild(doneBtn);
             });
             saveToLocal();
