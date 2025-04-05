@@ -374,8 +374,10 @@
             mainElement.style.background = "#fafafa"; // 恢復白色背景
             if (wrongWords.length > 0) {
                 alert("你還需要多練習的單字:\n" + wrongWords.map(w => `${w.en} = ${w.ch}`).join("\n"));
+                localStorage.setItem("wrongWords", JSON.stringify(wrongWords)); // ⭐ 儲存到 localStorage
             } else {
                 alert("很棒唷！你已經掌握了小學生300個基礎單字!");
+                localStorage.removeItem("wrongWords"); // 沒錯誤就清除舊的錯誤記錄（可選）
             }
             return;
         }
